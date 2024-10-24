@@ -1,11 +1,17 @@
 name: Update SRI Hash
 
 on:
+  # Trigger on any push to any branch
   push:
-    branches:
-      - develop
     paths:
-      - '**/main.js'  # This wildcard will match any main.js file, no matter where it is
+      - '**/main.js'  # Run whenever main.js changes, on any branch
+
+  # Trigger only on pull requests that target the develop branch
+  pull_request:
+    branches:
+      - develop  # Only run the action when the PR targets the develop branch
+    paths:
+      - '**/main.js'  # Only run if main.js is part of the PR
 
   # Allow manual triggering
   workflow_dispatch:
@@ -18,29 +24,37 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Find the main.js and index.html files
-        id: find-files
+      - name: Fetch develop branch
         run: |
-          MAIN_JS=$(find . -name "main.js")
-          INDEX_HTML=$(find . -name "index.html")
-          echo "MAIN_JS=$MAIN_JS" >> $GITHUB_ENV
-          echo "INDEX_HTML=$INDEX_HTML" >> $GITHUB_ENV
-          echo "Found main.js at: $MAIN_JS"
-          echo "Found index.html at: $INDEX_HTML"
+          # Fetch the develop branch
+          git fetch origin develop:develop
+
+      - name: Compare main.js with develop branch
+        id: compare
+        run: |
+          # Compare main.js in the current branch with the one in the develop branch
+          if git diff --exit-code develop -- src/proj/main.js; then
+            echo "No differences in main.js"
+            exit 0
+          else
+            echo "Differences found in main.js"
+          fi
 
       - name: Generate SRI hash using openssl and update HTML
+        if: steps.compare.outcome == 'failure'  # Only run this step if there are differences
         run: |
-          # Use the file paths from the previous step
-          HASH=$(openssl dgst -sha256 -binary $MAIN_JS | openssl base64 -A)
+          # Generate the sha256 SRI hash using openssl for main.js
+          HASH=$(openssl dgst -sha256 -binary src/proj/main.js | openssl base64 -A)
           
           # Update HTML file with the new integrity hash
-          sed -i "s|<script src=\"$MAIN_JS\".*>|<script src=\"$MAIN_JS\" integrity=\"sha256-$HASH\" crossorigin=\"anonymous\"></script>|" $INDEX_HTML
+          sed -i "s|<script src=\"src/proj/main.js\".*>|<script src=\"src/proj/main.js\" integrity=\"sha256-$HASH\" crossorigin=\"anonymous\"></script>|" src/proj/index.html
 
       - name: Commit and push changes
+        if: github.event_name == 'push' && steps.compare.outcome == 'failure'  # Only commit if there are changes and it's a push event
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add $INDEX_HTML
+          git add src/proj/index.html
           git commit -m 'Update SRI hash for main.js'
           git push
         env:
