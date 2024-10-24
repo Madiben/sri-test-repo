@@ -21,7 +21,7 @@ jobs:
           python-version: '3.x'
 
       - name: Run SRI Update Python Script
-        run: python scripts/update-sri.py  # This will now work with the correct paths
+        run: python scripts/update-sri-actions.py  # This will now work with the correct paths
 
       - name: Commit and push changes
         run: |
