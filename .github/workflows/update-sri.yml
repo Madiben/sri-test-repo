@@ -18,19 +18,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-
-      # Explicitly install sri-toolbox globally or locally
-      - name: Install sri-toolbox globally
-        run: npm install -g sri-toolbox
-
-      - name: Generate SRI hash and update HTML
+      - name: Generate SRI hash using openssl and update HTML
         run: |
-          # Generate SRI hash using sha256
-          HASH=$(sri-toolbox --algo sha256 main.js)
+          # Generate the sha256 SRI hash using openssl
+          HASH=$(openssl dgst -sha256 -binary main.js | openssl base64 -A)
           
           # Update HTML file with the new integrity hash
           sed -i "s|<script src=\"main.js\".*>|<script src=\"main.js\" integrity=\"sha256-$HASH\" crossorigin=\"anonymous\"></script>|" index.html
