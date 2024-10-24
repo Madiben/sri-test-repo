@@ -1,0 +1,42 @@
+name: Update SRI Hash
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'main.js'
+
+jobs:
+  update-sri:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install sri-toolbox
+        run: npm install sri-toolbox
+
+      - name: Generate SRI hash and update HTML
+        run: |
+          # Generate SRI hash
+          HASH=$(cat main.js | npx sri-toolbox --algo sha256)
+          
+          # Update HTML file
+          sed -i "s|<script src=\"main.js\".*>|<script src=\"main.js\" integrity=\"$HASH\" crossorigin=\"anonymous\"></script>|" index.html
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Update SRI hash for main.js'
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
