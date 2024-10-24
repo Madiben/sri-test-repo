@@ -1,12 +1,10 @@
 name: Update SRI Hash
 
 on:
-  # Trigger on any push to any branch
   push:
     paths:
-      - 'src/proj/main.js'  # Run whenever main.js changes
+      - 'src/proj/main.js'
 
-  # Allow manual triggering of the action
   workflow_dispatch:
 
 jobs:
@@ -22,11 +20,11 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install dependencies
-        run: pip install --upgrade pip  # No additional dependencies needed for this script
+      - name: Verify file locations
+        run: ls -R  # To verify where your scripts folder is being checked out in the GitHub Actions runner
 
       - name: Run SRI Update Python Script
-        run: python scripts/update_sri.py
+        run: python scripts/update_sri.py  # Assuming scripts/update_sri.py is in the correct folder after checkout
 
       - name: Commit and push changes
         run: |
