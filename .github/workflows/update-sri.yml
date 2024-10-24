@@ -4,16 +4,9 @@ on:
   # Trigger on any push to any branch
   push:
     paths:
-      - '**/main.js'  # Run whenever main.js changes, on any branch
+      - 'src/proj/main.js'  # Run whenever main.js changes
 
-  # Trigger only on pull requests that target the develop branch
-  pull_request:
-    branches:
-      - develop  # Only run the action when the PR targets the develop branch
-    paths:
-      - '**/main.js'  # Only run if main.js is part of the PR
-
-  # Allow manual triggering
+  # Allow manual triggering of the action
   workflow_dispatch:
 
 jobs:
@@ -24,33 +17,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Fetch develop branch
-        run: |
-          # Fetch the develop branch
-          git fetch origin develop:develop
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
 
-      - name: Compare main.js with develop branch
-        id: compare
-        run: |
-          # Compare main.js in the current branch with the one in the develop branch
-          if git diff --exit-code develop -- src/proj/main.js; then
-            echo "No differences in main.js"
-            exit 0
-          else
-            echo "Differences found in main.js"
-          fi
+      - name: Install dependencies
+        run: pip install --upgrade pip  # No additional dependencies needed for this script
 
-      - name: Generate SRI hash using openssl and update HTML
-        if: steps.compare.outcome == 'failure'  # Only run this step if there are differences
-        run: |
-          # Generate the sha256 SRI hash using openssl for main.js
-          HASH=$(openssl dgst -sha256 -binary src/proj/main.js | openssl base64 -A)
-          
-          # Update HTML file with the new integrity hash
-          sed -i "s|<script src=\"src/proj/main.js\".*>|<script src=\"src/proj/main.js\" integrity=\"sha256-$HASH\" crossorigin=\"anonymous\"></script>|" src/proj/index.html
+      - name: Run SRI Update Python Script
+        run: python path/to/update_sri.py  # Adjust the path to match the location of your script
 
       - name: Commit and push changes
-        if: github.event_name == 'push' && steps.compare.outcome == 'failure'  # Only commit if there are changes and it's a push event
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
