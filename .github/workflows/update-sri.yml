@@ -23,13 +23,14 @@ jobs:
         with:
           node-version: '16'
 
-      - name: Install sri-toolbox
-        run: npm install sri-toolbox
+      # Explicitly install sri-toolbox globally or locally
+      - name: Install sri-toolbox globally
+        run: npm install -g sri-toolbox
 
       - name: Generate SRI hash and update HTML
         run: |
           # Generate SRI hash using sha256
-          HASH=$(npx sri-toolbox --algo sha256 main.js)
+          HASH=$(sri-toolbox --algo sha256 main.js)
           
           # Update HTML file with the new integrity hash
           sed -i "s|<script src=\"main.js\".*>|<script src=\"main.js\" integrity=\"sha256-$HASH\" crossorigin=\"anonymous\"></script>|" index.html
