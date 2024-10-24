@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     if (header) {
         header.addEventListener('mouseover', () => {
-            alert('HI, I see you');
+            alert('HI, I see you..');
         });
     }
 });
