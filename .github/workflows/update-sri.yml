@@ -1,11 +1,17 @@
 name: Update SRI Hash
 
 on:
+  # Trigger on any push to any branch
   push:
-    branches:
-      - develop
     paths:
-      - '**/main.js'  # This wildcard will match any main.js file, no matter where it is
+      - '**/main.js'  # Run whenever main.js changes, on any branch
+
+  # Trigger only on pull requests that target the develop branch
+  pull_request:
+    branches:
+      - develop  # Only run the action when the PR targets the develop branch
+    paths:
+      - '**/main.js'  # Only run if main.js is part of the PR
 
   # Allow manual triggering
   workflow_dispatch:
