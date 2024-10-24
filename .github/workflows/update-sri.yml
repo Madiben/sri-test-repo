@@ -26,7 +26,7 @@ jobs:
         run: pip install --upgrade pip  # No additional dependencies needed for this script
 
       - name: Run SRI Update Python Script
-        run: python path/to/update_sri.py  # Adjust the path to match the location of your script
+        run: python scripts/update_sri.py
 
       - name: Commit and push changes
         run: |
