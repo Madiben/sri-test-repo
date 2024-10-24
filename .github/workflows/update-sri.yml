@@ -15,11 +15,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Verify file locations
-        run: ls -R  # Check the structure to find where main.js is located
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
 
       - name: Run SRI Update Python Script
-        run: python scripts/update_sri.py
+        run: python scripts/update-sri.py  # This will now work with the correct paths
 
       - name: Commit and push changes
         run: |
