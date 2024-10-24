@@ -3,7 +3,7 @@ name: Update SRI Hash
 on:
   push:
     paths:
-      - 'src/proj/main.js'  # Run whenever main.js changes
+      - 'src/proj/main.js'
 
   workflow_dispatch:
 
@@ -15,16 +15,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
-      - name: Install dependencies
-        run: pip install --upgrade pip  # No additional dependencies needed for this script
+      - name: Verify file locations
+        run: ls -R  # Check the structure to find where main.js is located
 
       - name: Run SRI Update Python Script
-        run: python scripts/update-sri.py  # Corrected path
+        run: python scripts/update_sri.py
 
       - name: Commit and push changes
         run: |
