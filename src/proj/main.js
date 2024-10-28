@@ -3,9 +3,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     if (header) {
         header.addEventListener('mouseover', () => {
-            alert('HI World, I see you World :>, Successs');
+            alert('HI World, I see you World :>, Testing pipeline');
         });
-
 ss
     }
 });
