@@ -15,4 +15,3 @@ function generateRandomMessage() {
   }
   
   console.log(generateRandomMessage());
-  
