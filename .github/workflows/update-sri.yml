@@ -2,9 +2,8 @@ name: Update SRI Hash
 
 on:
   push:
-    paths:
-      - 'src/proj/main.js'
-
+    branches:
+      - '**'
   workflow_dispatch:
 
 jobs:
@@ -26,10 +25,10 @@ jobs:
       - name: Check for changes
         run: |
           git add src/proj/index.html
-          git diff --cached --exit-code || echo "Changes detected"
-        id: changes
+          git diff --cached --quiet || echo "changes_detected=true" >> $GITHUB_ENV
 
       - name: Commit and push changes
+        if: env.changes_detected == 'true'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
