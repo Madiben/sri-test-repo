@@ -1,0 +1,42 @@
+name: Update SRI Hash
+
+on:
+  push:
+    branches:
+      - '**'  
+  workflow_dispatch:
+
+jobs:
+  update-sri:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Run SRI Update Python Script
+        run: python scripts/update-sri.py  # Path to your SRI update script
+
+      - name: Check for changes
+        run: |
+          git add src/proj/index.html
+          git diff --cached --quiet || echo "changes_detected=true" >> $GITHUB_ENV
+
+      - name: Check for changes
+        run: |
+          git add src/proj/index.html
+          git diff --cached --quiet || echo "changes_detected=true" >> $GITHUB_ENV
+
+      - name: Commit and push changes
+        if: env.changes_detected == 'true'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Update SRI hash for main.js'
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
