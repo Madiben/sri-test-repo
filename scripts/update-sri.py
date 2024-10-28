@@ -3,8 +3,8 @@ import base64
 import re
 
 # Paths to your main.js and index.html files
-main_js_path = "../src/proj/main.js"  # Update this to match your index.html script src
-index_html_path = "../src/proj/index.html"  # Adjust this if needed
+main_js_path = "src/proj/main.js"  # Adjust to your JavaScript file path
+index_html_path = "src/proj/index.html"  # Adjust to your HTML file path
 
 def generate_sri_hash(file_path):
     """Generates a SHA256 SRI hash for the given file."""
@@ -19,7 +19,6 @@ def update_html(integrity_hash):
         html_content = f.read()
 
     # Use regex to find and update the integrity attribute in the script tag
-    # We will replace the entire integrity attribute to avoid appending
     script_tag_pattern = re.compile(r'(<script src="main.js" integrity=")([^"]+)(")', re.IGNORECASE)
 
     if script_tag_pattern.search(html_content):
@@ -33,7 +32,6 @@ def update_html(integrity_hash):
         print(f"Updated {index_html_path} with new integrity hash: {integrity_hash}")
     else:
         print(f"Script tag for main.js not found or integrity attribute missing in {index_html_path}")
-
 
 def main():
     # Generate new SRI hash for main.js
