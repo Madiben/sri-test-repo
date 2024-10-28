@@ -26,11 +26,6 @@ jobs:
           git add src/proj/index.html
           git diff --cached --quiet || echo "changes_detected=true" >> $GITHUB_ENV
 
-      - name: Check for changes
-        run: |
-          git add src/proj/index.html
-          git diff --cached --quiet || echo "changes_detected=true" >> $GITHUB_ENV
-
       - name: Commit and push changes
         if: env.changes_detected == 'true'
         run: |
